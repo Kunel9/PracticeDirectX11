@@ -22,6 +22,11 @@ cbuffer drawMat : register(b2)
     float hilight;
 };
 
+cbuffer drawerV : register(b0)
+{
+    float arrayTest[32];
+};
+
 struct VS_OUTPUT
 {
     float4 pos : SV_POSITION;
@@ -46,9 +51,30 @@ float3 rotY(float3 pos, float a)
 VS_OUTPUT VS(uint vID : SV_VertexID)
 {
     VS_OUTPUT output = (VS_OUTPUT)0;
-    float2 quad[6] = { -1, -1, 1, -1, -1, 1, 1, -1, 1, 1, -1, 1 };
+    //float2 quad[6] = { -1, -1, 1, -1, -1, 1, 1, -1, 1, 1, -1, 1 };
+
+    float2 quad[512];
+
+    int current = 0;
+    int step_x = 2;
+    quad[0] = float2(-1, -1);
+
+    for (int i = 0; i < vID; ++i) {
+
+        current = i * 6;
+        
+        quad[current] = float2(-1 + step_x * i, -1);
+        quad[current+1] = float2(1 + step_x * i, -1);
+        quad[current+2] = float2(-1 + step_x * i, 1);
+        quad[current+3] = float2(1 + step_x * i, -1);
+        quad[current+4] = float2(1 + step_x * i, 1);
+        quad[current+5] = float2(-1 + step_x * i, 1);
+   
+    }
+
     float2 p = quad[vID];
-    float4 pos = float4(quad[vID], 0, 1);
+    float4 pos = float4(quad[vID], 0, 5);
+    pos.x -= arrayTest[0];
     output.pos = mul(pos, mul(view[0], proj[0]));
     output.uv = float2(1, -1) * p / 2. + .5;
     return output;
