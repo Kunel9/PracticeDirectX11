@@ -48,6 +48,14 @@ float3 rotY(float3 pos, float a)
     return pos;
 }
 
+float4 getNewPoint(float4 currentPos)
+{
+    float newValue = 3.1415926535 * (currentPos.x / arrayTest[0]);
+    currentPos.x = cos(newValue) * 4;
+    currentPos.z = sin(newValue) * 4;
+    return currentPos;
+}
+
 VS_OUTPUT VS(uint vID : SV_VertexID)
 {
     VS_OUTPUT output = (VS_OUTPUT)0;
@@ -57,17 +65,27 @@ VS_OUTPUT VS(uint vID : SV_VertexID)
     int rowIndex = quadIndex / arrayTest[0];
     int colIndex = quadIndex % arrayTest[0];
     
-    float2 quad[6] = {-1, -1, 1, -1, -1, 1,1, -1, 1, 1, -1, 1};
+    float2 quad[6] = {
+        -1, -1, 
+        1, -1, 
+        -1, 1, 
+        1, -1, 
+        1, 1,
+        -1, 1};
     
     float2 p = quad[pointIndex];
-    p.x += 2.2 * colIndex;
-    p.y += 2.2 * rowIndex;
+    p.x += 2 * colIndex;
+    p.y += 2 * rowIndex;
     float4 pos = float4(p, 0, 5);
     pos.x -= arrayTest[0];
     pos.y -= arrayTest[0];
     
+    //
+    pos = getNewPoint(pos);
+    //
+
     output.pos = mul(pos, mul(view[0], proj[0]));
-    output.uv = float2(1, -1) * p / 2. + .5;
+    output.uv = float2(1, -1) * quad[pointIndex] / 2. + .5;
     
     return output;
 }
